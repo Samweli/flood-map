@@ -1,8 +1,7 @@
-var DATASET_ID = 'bmsjiigj';
-var DATASETS_BASE = 'https://api.mapbox.com/datasets/v1/samtwesa/' + DATASET_ID + '/';
+var DATASET_ID = 'cihoxpoqp0000vjkq160aw68g';
+var DATASETS_BASE = 'https://api.mapbox.com/datasets/v1/chennaiflood/' + DATASET_ID + '/';
 // var selectedRoadsSource;
-var datasetsAccessToken = 'pk.eyJ1Ijoic2FtdHdlc2EiLCJhIjoiZTc1OTQ4ODE0ZmY2MzY0MGYwMDNjOWNlYTYxMjU4NDYifQ.F1zCcOYqpXWd4C9l9xqvEQ';
-
+var datasetsAccessToken = 'sk.eyJ1IjoiY2hlbm5haWZsb29kIiwiYSI6ImNpaG9mOGljdTBibmN0aGo3NWR6Y3Q0aXQifQ.X73YugnJDlhZEhxz2X86WA';
 // Define map locations
 var mapLocation = {
     'reset': {
@@ -149,6 +148,7 @@ map.on('style.load', function (e) {
         }
         $.getJSON(url, params, function (data) {
             if (data.features.length > 0) {
+                console.log("Data Present");
                 data.features.forEach(function (feature) {
                     feature.properties.id = feature.id;
                 });

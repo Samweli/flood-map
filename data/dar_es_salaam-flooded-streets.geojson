@@ -5,11 +5,6 @@
       "type": "Feature",
       "id": "way/367499114",
       "properties": {
-        "@id": "way/367499114",
-        "highway": "footway",
-        "smoothness": "intermediate",
-        "surface": "unpaved",
-        "width": "2",
         "type": "residential", 
         "oneway": 0,
         "is_flooded": true, 
