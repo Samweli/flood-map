@@ -1,0 +1,62 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+     {
+      "type": "Feature",
+      "id": "way/367499114",
+      "properties": {
+        "@id": "way/367499114",
+        "highway": "footway",
+        "smoothness": "intermediate",
+        "surface": "unpaved",
+        "width": "2",
+        "type": "residential", 
+        "oneway": 0,
+        "is_flooded": true, 
+        "class": "street", 
+        "osm_id": 367499114
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            39.2665975,
+            -6.8081325
+          ],
+          [
+            39.266657,
+            -6.8081331
+          ],
+          [
+            39.2666962,
+            -6.8081202
+          ],
+          [
+            39.2667436,
+            -6.8081281
+          ],
+          [
+            39.2668426,
+            -6.8081185
+          ],
+          [
+            39.2669778,
+            -6.8080777
+          ],
+          [
+            39.2670956,
+            -6.8080219
+          ],
+          [
+            39.2671872,
+            -6.8079172
+          ],
+          [
+            39.2672358,
+            -6.8078203
+          ]
+        ]
+      }
+    }
+  ]
+}
