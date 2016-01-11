@@ -45,10 +45,10 @@ var mapLocation = {
 
 
 // Simple map
-mapboxgl.accessToken = 'pk.eyJ1IjoicGxhbmVtYWQiLCJhIjoiemdYSVVLRSJ9.g3lbg_eN0kztmsfIPxa9MQ';
+mapboxgl.accessToken = 'pk.eyJ1Ijoic2FtdHdlc2EiLCJhIjoiZTc1OTQ4ODE0ZmY2MzY0MGYwMDNjOWNlYTYxMjU4NDYifQ.F1zCcOYqpXWd4C9l9xqvEQ';
 var map = new mapboxgl.Map({
     container: 'map', // container id
-    style: 'mapbox://styles/planemad/cih4qzr0w0012awltzvpie7qa', //stylesheet location
+    style: 'mapbox://styles/samtwesa/cij8lmsyp000wbkkuvcdaprhc', //stylesheet location
     hash: true
 });
 mapLocate('reset');
@@ -139,7 +139,8 @@ map.on('style.load', function (e) {
     };
     $('#feature-count').toggleClass('loading');
     function getFeatures(startID) {
-        var url = DATASETS_BASE + 'features';
+        // var url = DATASETS_BASE + 'features';
+        var url = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
         var params = {
             'access_token': datasetsAccessToken
         };
@@ -148,9 +149,10 @@ map.on('style.load', function (e) {
         }
         $.getJSON(url, params, function (data) {
             if (data.features.length > 0) {
-                console.log("Data Present");
+                console.log("Data Present in dar");
                 data.features.forEach(function (feature) {
                     feature.properties.id = feature.id;
+                    console.log(feature);
                 });
                 featuresGeoJSON.features = featuresGeoJSON.features.concat(data.features);
                 var lastFeatureID = data.features[data.features.length - 1].id;
@@ -243,7 +245,8 @@ map.on('style.load', function (e) {
                     if (features.length > 0) {
 
                         $('#map').toggleClass('loading');
-                        var saveURL = DATASETS_BASE + 'features/' + features[0].properties.id + '?access_token=' + datasetsAccessToken;
+                       //var saveURL = DATASETS_BASE + 'features/' + features[0].properties.id + '?access_token=' + datasetsAccessToken;
+                        var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
 
                         var index = addedRoads.indexOf(features[0].properties.id);
                         $.ajax({
