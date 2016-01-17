@@ -304,6 +304,7 @@ map.on('style.load', function (e) {
                                 'success': function (response) {
                                     $('#map').toggleClass('loading');
                                     tempObj.id = response.id;
+                                    console.log("response and id "+ response + " "+ response.id)
                                     tempObj.properties.id = response.id;
                                     addedFeatures.push(tempObj);
                                     data.features.push(tempObj);

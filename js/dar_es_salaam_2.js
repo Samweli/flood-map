@@ -1,49 +1,59 @@
-var DATASET_ID = '';
-//var DATASETS_BASE = 'https://api.mapbox.com/v4/samtwesa.omckmmch/' + DATASET_ID + '/';
-var DATASETS_BASE = ''
+var DATASET_ID = 'cihoxpoqp0000vjkq160aw68g';
+var DATASETS_BASE = 'https://api.mapbox.com/datasets/v1/chennaiflood/' + DATASET_ID + '/';
 // var selectedRoadsSource;
+var datasetsAccessToken = 'sk.eyJ1IjoiY2hlbm5haWZsb29kIiwiYSI6ImNpaG9mOGljdTBibmN0aGo3NWR6Y3Q0aXQifQ.X73YugnJDlhZEhxz2X86WA';
 
-//var datasetsAccessToken = 'pk.eyJ1Ijoic2FtdHdlc2EiLCJhIjoiZTc1OTQ4ODE0ZmY2MzY0MGYwMDNjOWNlYTYxMjU4NDYifQ.F1zCcOYqpXWd4C9l9xqvEQ';
-var datasetsAccessToken = ''
 // Define map locations
 var mapLocation = {
     'reset': {
-        'center': [39.2110, -6.8439],
+        'center': [39.2346, -6.8492],
         'zoom': 11,
         'pitch': 0,
         'bearing': 0
     },
-    'magomeni': {
-        'center': [39.26668, -6.80702],
+    'pallikaranai': {
+        'center': [80.22, 12.926],
         'zoom': 13.8,
         'pitch': 45,
         'bearing': 90
     },
-    'jangwani': {
-        'center': [39.26789, -6.81346],
-        'zoom': 17,
+    'adyar-river': {
+        'center': [80.261, 13.014],
+        'zoom': 13.8,
         'pitch': 60,
         'bearing': -64,
         'highlight': 'water'
     },
-    'suna': {
-        'center': [39.2110, -6.8439],
+    'cooum-river': {
+        'center': [80.281, 13.074],
         'zoom': 13.8,
         'pitch': 60,
         'bearing': -64
     },
-    'kigogo': {
-        'center': [39.2300, -6.8107],
-        'zoom': 16,
+    'mudichur': {
+        'center': [80.06, 12.91],
+        'zoom': 13,
         'pitch': 50,
         'bearing': -10
     },
-    'tandale': {
-        'center': [39.24360, -6.79854],
-        'zoom': 17,
+    'aminjikarai': {
+        'center': [80.21, 13.07],
+        'zoom': 13.8,
         'pitch': 50,
         'bearing': -10
     },
+    'velachery': {
+        'center': [80.21, 12.97],
+        'zoom': 13.8,
+        'pitch': 50,
+        'bearing': -10
+    },
+    'omr': {
+        'center': [80.23, 12.88],
+        'zoom': 13,
+        'pitch': 70,
+        'bearing': -10
+    }
 };
 
 
@@ -141,36 +151,27 @@ map.on('style.load', function (e) {
         'features': []
     };
     $('#feature-count').toggleClass('loading');
-    console.log("started loading");
     function getFeatures(startID) {
-        //var url = DATASETS_BASE + 'features.json';
-        //var url = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
-        console.log("start id "+startID);
-        var url = 'http://floods-daressalaam.rhcloud.com/get_data.php'
-
+        var url = DATASETS_BASE + 'features';
         var params = {
+            'access_token': datasetsAccessToken
         };
         if (startID) {
             params.start = startID;
         }
         $.getJSON(url, params, function (data) {
             if (data.features.length > 0) {
-                console.log("Data Present in dar " + url + params.access_token +" "+ params.startID);
                 data.features.forEach(function (feature) {
                     feature.properties.id = feature.id;
-                    console.log(feature);
                 });
                 featuresGeoJSON.features = featuresGeoJSON.features.concat(data.features);
                 var lastFeatureID = data.features[data.features.length - 1].id;
                 getFeatures(lastFeatureID);
-                console.log(lastFeatureID);
-                console.log(featuresGeoJSON);
                 selectedRoadsSource.setData(featuresGeoJSON);
                 updateFeatureCount(featuresGeoJSON);
             } else {
               updateFeatureCount(featuresGeoJSON);
               $('#feature-count').toggleClass('loading');
-              console.log('no new features');
                 playWithMap(featuresGeoJSON);
             }
         });
@@ -200,19 +201,14 @@ map.on('style.load', function (e) {
 
   //Popups on click
     map.on('click', function (e) {
-        console.log('click logged'+e.point);
         map.featuresAt(e.point, {
             radius: 10,
             layer: ['chennai-relief-camps', 'chennai-relief-camps-22nov'],
             includeGeometry: true
         }, function (err, features) {
-
-            console.log(features.length);
-            if (err){ console.log('error'); throw err;}
+            if (err) throw err;
 
             if (features.length > 0) {
-                console.log(features[0].geometry.coordinates);
-                console.log(features[0].properties.Name);
                 var popupHTML = '<h5>' + features[0].properties.Name + '</h5><p>' + $('[data-map-layer=' + features[0].layer.id + ']').html() + '</p>';
                 var popup = new mapboxgl.Popup()
                                         .setLngLat(features[0].geometry.coordinates)
@@ -225,7 +221,6 @@ map.on('style.load', function (e) {
   // Update map legend from styles
   $('[data-map-layer]').each(function () {
       // Get the color of the feature from the map
-      console.log('changing color');
       var obj = $(this).attr('data-map-layer');
 
       try {
@@ -251,7 +246,6 @@ map.on('style.load', function (e) {
 
 
         map.on('click', function (e) {
-            console.log('to delete');
             if (map.getZoom() >= 15) {
                 //Check if the feature clicked on is in the selected Roads Layer.
                 //If yes, UNSELECT the road
@@ -261,67 +255,56 @@ map.on('style.load', function (e) {
                     if (features.length > 0) {
 
                         $('#map').toggleClass('loading');
-                        console.log("to delete in features length if");
+                        var saveURL = DATASETS_BASE + 'features/' + features[0].properties.id + '?access_token=' + datasetsAccessToken;
 
-                        //var saveURL = DATASETS_BASE + 'features.json/' + features[0].properties.id + '?access_token=' + datasetsAccessToken;
-                        //var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
-                        var saveURL = 'http://floods-daressalaam.rhcloud.com/delete_data.php';
                         var index = addedRoads.indexOf(features[0].properties.id);
                         $.ajax({
-                            'method': 'POST',
+                            'method': 'DELETE',
                             'url': saveURL,
-                            'data': {"id":features[0].properties.id},
+                            'contentType': 'application/json',
                             'success': function () {
                                 $('#map').toggleClass('loading');
-                                console.log("successfull delete");
                                 data['features'].splice(index, 1);
                                 addedRoads.splice(index, 1);
                                 addedFeatures.splice(index, 1);
                                 selectedRoadsSource.setData(data);
                                 updateFeatureCount(data);
                             },
-                            'error': function (xhr, status, error) {
-                                    $('#map').toggleClass('loading');
-                                    var err = xhr.responseText + xhr.status;
-                                    console.log('problem deleting '+ err);
+                            'error': function () {
+                                $('#map').toggleClass('loading');
                             }
                         });
                     } else {
                         //If road is not present in the `selected-roads` layer,
                         //check the glFeatures layer to see if the road is present.
                         //If yes,ADD it to the `selected-roads` layer
-                        console.log('putting');
                         map.featuresAt(e.point, {radius: 5, includeGeometry: true, layer: mapLayerCollection['road']}, function (err, glFeatures) {
                             if (err) throw err;
 
                             var tempObj = {
                                 'type': 'Feature'
+
                             };
 
                             tempObj.geometry = glFeatures[0].geometry;
                             tempObj.properties = glFeatures[0].properties;
                             tempObj.properties['is_flooded'] = true;
+                            tempObj.properties['area'] = 'Dar es salaam';
 
                             $('#map').toggleClass('loading');
-                            console.log("loading to push");
 
                             var id = md5(JSON.stringify(tempObj));
                             tempObj.id = id;
-                            //var saveURL = DATASETS_BASE + 'features/' + id + '?access_token=' + datasetsAccessToken;
-                            //var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
-                            var saveURL = 'http://floods-daressalaam.rhcloud.com/put_data.php';
-                            console.log("about to push");
-                            console.log(tempObj);
+                            var saveURL = DATASETS_BASE + 'features/' + id + '?access_token=' + datasetsAccessToken;
+
                             $.ajax({
-                                'method': 'POST',
-                                'crossDomain':true,
+                                'method': 'PUT',
                                 'url': saveURL,
-                                'data': {'data' : tempObj},
+                                'data': JSON.stringify(tempObj),
                                 'dataType': 'json',
+                                'contentType': 'application/json',
                                 'success': function (response) {
                                     $('#map').toggleClass('loading');
-                                    console.log('no problem');
-                                    console.log(data);
                                     tempObj.id = response.id;
                                     tempObj.properties.id = response.id;
                                     addedFeatures.push(tempObj);
@@ -330,10 +313,8 @@ map.on('style.load', function (e) {
                                     selectedRoadsSource.setData(data);
                                     updateFeatureCount(data);
                                 },
-                                'error': function (xhr, status, error) {
+                                'error': function () {
                                     $('#map').toggleClass('loading');
-                                    var err = xhr.responseText + xhr.status;
-                                    console.log('problem putting '+ err);
                                 }
                             });
                         });
