@@ -100,6 +100,7 @@ var mapLayerCollection = {
 map.on('style.load', function (e) {
 
     var selectedRoadsSource = new mapboxgl.GeoJSONSource({});
+    var selectedBuildingsSource = new mapboxgl.GeoJSONSource({});
 
     map.addSource('selected-roads', selectedRoadsSource);
     map.addLayer({
@@ -111,6 +112,19 @@ map.on('style.load', function (e) {
             'line-color': 'rgba(255,5,230,1)',
             'line-width': 3,
             'line-opacity': 0.6
+        }
+    });
+
+    map.addSource('selected-buildings', selectedBuildingsSource);
+    map.addLayer({
+        'id': 'selected-buildings',
+        'type': 'fill',
+        'source': 'selected-buildings',
+        'interactive': true,
+        'paint': {
+            'fill-color': 'rgba(255,5,230,1)',
+            'fill-width': 3,
+            'fill-opacity': 0.6
         }
     });
 
@@ -165,7 +179,10 @@ map.on('style.load', function (e) {
                 getFeatures(lastFeatureID);
                 console.log(lastFeatureID);
                 console.log(featuresGeoJSON);
-                selectedRoadsSource.setData(featuresGeoJSON);
+
+                selectedRoadsSource.setData(getRoads(featuresGeoJSON));
+                selectedBuildingsSource.setData(getBuildings(featuresGeoJSON));
+
                 updateFeatureCount(featuresGeoJSON);
             } else {
               updateFeatureCount(featuresGeoJSON);
@@ -239,6 +256,7 @@ map.on('style.load', function (e) {
 
     function playWithMap(data) {
         var addedRoads = [];
+        var addedBuildings = [];
         var addedFeatures = [];
 
         //Dump Data
@@ -251,7 +269,7 @@ map.on('style.load', function (e) {
 
 
         map.on('click', function (e) {
-            console.log('to delete');
+            console.log('to delete road');
             if (map.getZoom() >= 15) {
                 //Check if the feature clicked on is in the selected Roads Layer.
                 //If yes, UNSELECT the road
@@ -262,35 +280,55 @@ map.on('style.load', function (e) {
 
                         $('#map').toggleClass('loading');
                         console.log("to delete in features length if");
+                        console.log(features);
 
                         //var saveURL = DATASETS_BASE + 'features.json/' + features[0].properties.id + '?access_token=' + datasetsAccessToken;
                         //var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
                         var saveURL = 'http://localhost:5500/model/delete_data.php';
                         var index = addedRoads.indexOf(features[0].properties.id);
+                        console.log('index is' + index)
+                        console.log('id is'+features[0].properties.id);
                         $.ajax({
                             'method': 'POST',
                             'url': saveURL,
                             'data': {"id":features[0].properties.id},
-                            'success': function () {
+                            'success': function (result) {
                                 $('#map').toggleClass('loading');
-                                console.log("successfull delete");
-                                data['features'].splice(index, 1);
+
+                                console.log("successfull delete roads");
+                                console.log(data);
+                                console.log("Results");
+                                console.log(result);
+                            
+                                data = arrangeId(result);
+
+
+                                console.log("Updated data");
+                                console.log(data);
+
                                 addedRoads.splice(index, 1);
                                 addedFeatures.splice(index, 1);
-                                selectedRoadsSource.setData(data);
+                                console.log('roads features');
+                                console.log(addedRoads);
+
+                                console.log('features');
+                                console.log(addedFeatures);
+
+                                selectedRoadsSource.setData(getRoads(data));
+                                
                                 updateFeatureCount(data);
                             },
                             'error': function (xhr, status, error) {
                                     $('#map').toggleClass('loading');
                                     var err = xhr.responseText + xhr.status;
-                                    console.log('problem deleting '+ err);
+                                    console.log('problem deleting roads'+ err);
                             }
                         });
                     } else {
                         //If road is not present in the `selected-roads` layer,
                         //check the glFeatures layer to see if the road is present.
                         //If yes,ADD it to the `selected-roads` layer
-                        console.log('putting');
+                        console.log('putting road');
                         map.featuresAt(e.point, {radius: 5, includeGeometry: true, layer: mapLayerCollection['road']}, function (err, glFeatures) {
                             if (err) throw err;
                             if(glFeatures.length > 0){
@@ -303,15 +341,14 @@ map.on('style.load', function (e) {
                             tempObj.properties['is_flooded'] = true;
 
                             $('#map').toggleClass('loading');
-                            console.log("loading to push");
+                            console.log("loading to push road");
 
                             var id = md5(JSON.stringify(tempObj));
                             tempObj.id = id;
                             //var saveURL = DATASETS_BASE + 'features/' + id + '?access_token=' + datasetsAccessToken;
                             //var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
                             var saveURL = 'http://localhost:5500/model/put_data.php';
-                            console.log("about to push");
-                            console.log(tempObj);
+                            console.log("about to push road");
                             $.ajax({
                                 'method': 'POST',
                                 'crossDomain':true,
@@ -321,13 +358,19 @@ map.on('style.load', function (e) {
                                 'success': function (response) {
                                     $('#map').toggleClass('loading');
                                     console.log('no problem');
-                                    console.log(data);
+                                    console.log('id'+response.id)
                                     tempObj.id = response.id;
                                     tempObj.properties.id = response.id;
+                                    console.log('tempObj');
+                                    console.log(tempObj);
                                     addedFeatures.push(tempObj);
                                     data.features.push(tempObj);
-                                    addedRoads.push(glFeatures[0].properties.osm_id);
-                                    selectedRoadsSource.setData(data);
+                                    console.log("before updates");
+                                    console.log(data.features);
+                                    console.log("updated data");
+                                    console.log(data.features);
+                                    addedRoads.push(glFeatures[0].id);
+                                    selectedRoadsSource.setData(getRoads(data));
                                     updateFeatureCount(data);
                                 },
                                 'error': function (xhr, status, error) {
@@ -360,7 +403,7 @@ map.on('style.load', function (e) {
                                         data['features'].splice(index, 1);
                                         addedBuildings.splice(index, 1);
                                         addedFeatures.splice(index, 1);
-                                        selectedBuildingsSource.setData(getBuidlings(data));
+                                        selectedBuildingsSource.setData(getBuildings(data));
                                         updateFeatureCount(data);
                                     },
                                     'error': function (xhr, status, error) {
@@ -372,25 +415,24 @@ map.on('style.load', function (e) {
                         }else{
 
                         console.log('putting building');
-                        map.featuresAt(e.point, {radius: 5, includeGeometry: true, layer: mapLayerCollection['buidlings']}, function (err, glFeatures) {
+                        map.featuresAt(e.point, {radius: 5, includeGeometry: true, layer: mapLayerCollection['buildings']}, function (err, glFeatures) {
                         if (err) throw err;
                         var tempObj = {
                             'type': 'Feature'
                         };
-                        if()
                         tempObj.geometry = glFeatures[0].geometry;
                         tempObj.properties = glFeatures[0].properties;
                         tempObj.properties['is_flooded'] = true;
 
                         $('#map').toggleClass('loading');
-                        console.log("loading to push");
+                        console.log("loading to push buildings");
 
                         var id = md5(JSON.stringify(tempObj));
                         tempObj.id = id;
                         //var saveURL = DATASETS_BASE + 'features/' + id + '?access_token=' + datasetsAccessToken;
                         //var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
                         var saveURL = 'http://localhost:5500/model/put_data.php';
-                        console.log("about to push");
+                        console.log("about to push buildings");
                         console.log(tempObj);
                         $.ajax({
                             'method': 'POST',
@@ -407,7 +449,7 @@ map.on('style.load', function (e) {
                                 addedFeatures.push(tempObj);
                                 data.features.push(tempObj);
                                 addedBuildings.push(glFeatures[0].properties.osm_id);
-                                selectedBuidlingsSource.setData(getBuildings(data));
+                                selectedBuildingsSource.setData(getBuildings(data));
                                 updateFeatureCount(data);
                             },
                             'error': function (xhr, status, error) {
@@ -428,6 +470,48 @@ map.on('style.load', function (e) {
         });
     }
 });
+// Updated data respectively of the sources 
+function getRoads(data){
+    var roads = {
+        'type': 'FeatureCollection',
+        'features': []
+    };
+    features = [];
+    for (var i = 0; i < data.features.length; i++) {
+        if(data.features[i].geometry.type === "LineString"){
+            features.push(data.features[i]);
+        }
+    }
+    roads.features = features;
+    console.log('returned data');
+    console.log(roads);
+    return roads;
+}
+function getBuildings(data){
+    var buildings = {
+        'type': 'FeatureCollection',
+        'features': []
+    };
+    features = [];
+    for (var i = 0; i < data.features.length; i++) {
+        if(data.features[i].geometry.type === "Polygon"){
+            features.push(data.features[i]);
+        }
+    }
+    buildings.features = features;
+    return buildings;
+}
+// return arranged data
+function arrangeId(data){
+    
+    for (var i = 0; i < data.features.length; i++) {
+        data.features[i].properties.id = data.features[i].id;
+    }
+    return data;
+}
+
+
+
   //Update feature count
 function updateFeatureCount(data) {
     var count = data.features.length;
