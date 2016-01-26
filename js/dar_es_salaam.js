@@ -52,7 +52,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoicGxhbmVtYWQiLCJhIjoiemdYSVVLRSJ9.g3lbg_eN0kzt
 var map = new mapboxgl.Map({
     container: 'map', // container id
     style: 'mapbox://styles/planemad/cih4qzr0w0012awltzvpie7qa', //stylesheet location
-    hash: true
+    hash: false
 });
 mapLocate('reset');
 
@@ -146,7 +146,7 @@ map.on('style.load', function (e) {
         //var url = DATASETS_BASE + 'features.json';
         //var url = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
         console.log("start id "+startID);
-        var url = 'http://floods-daressalaam.rhcloud.com/get_data.php'
+        var url = 'http://localhost:5500/model/get_data.php'
 
         var params = {
         };
@@ -265,7 +265,7 @@ map.on('style.load', function (e) {
 
                         //var saveURL = DATASETS_BASE + 'features.json/' + features[0].properties.id + '?access_token=' + datasetsAccessToken;
                         //var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
-                        var saveURL = 'http://floods-daressalaam.rhcloud.com/delete_data.php';
+                        var saveURL = 'http://localhost:5500/model/delete_data.php';
                         var index = addedRoads.indexOf(features[0].properties.id);
                         $.ajax({
                             'method': 'POST',
@@ -293,7 +293,7 @@ map.on('style.load', function (e) {
                         console.log('putting');
                         map.featuresAt(e.point, {radius: 5, includeGeometry: true, layer: mapLayerCollection['road']}, function (err, glFeatures) {
                             if (err) throw err;
-
+                            if(glFeatures.length > 0){
                             var tempObj = {
                                 'type': 'Feature'
                             };
@@ -309,7 +309,7 @@ map.on('style.load', function (e) {
                             tempObj.id = id;
                             //var saveURL = DATASETS_BASE + 'features/' + id + '?access_token=' + datasetsAccessToken;
                             //var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
-                            var saveURL = 'http://floods-daressalaam.rhcloud.com/put_data.php';
+                            var saveURL = 'http://localhost:5500/model/put_data.php';
                             console.log("about to push");
                             console.log(tempObj);
                             $.ajax({
@@ -336,6 +336,91 @@ map.on('style.load', function (e) {
                                     console.log('problem putting '+ err);
                                 }
                             });
+                            // for buildings 
+                            }else{
+                                map.featuresAt(e.point, {radius: 5, includeGeometry: true, layer: 'selected-buildings'}, function (err, features) {
+                                if (err) throw err;
+
+                                if (features.length > 0) {
+
+                                $('#map').toggleClass('loading');
+                                console.log("to delete in features length if");
+
+                                //var saveURL = DATASETS_BASE + 'features.json/' + features[0].properties.id + '?access_token=' + datasetsAccessToken;
+                                //var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
+                                var saveURL = 'http://localhost:5500/model/delete_data.php';
+                                var index = addedBuildings.indexOf(features[0].properties.id);
+                                $.ajax({
+                                    'method': 'POST',
+                                    'url': saveURL,
+                                    'data': {"id":features[0].properties.id},
+                                    'success': function () {
+                                        $('#map').toggleClass('loading');
+                                        console.log("successfull delete");
+                                        data['features'].splice(index, 1);
+                                        addedBuildings.splice(index, 1);
+                                        addedFeatures.splice(index, 1);
+                                        selectedBuildingsSource.setData(getBuidlings(data));
+                                        updateFeatureCount(data);
+                                    },
+                                    'error': function (xhr, status, error) {
+                                            $('#map').toggleClass('loading');
+                                            var err = xhr.responseText + xhr.status;
+                                            console.log('problem deleting buildings'+ err);
+                                    }
+                                });
+                        }else{
+
+                        console.log('putting building');
+                        map.featuresAt(e.point, {radius: 5, includeGeometry: true, layer: mapLayerCollection['buidlings']}, function (err, glFeatures) {
+                        if (err) throw err;
+                        var tempObj = {
+                            'type': 'Feature'
+                        };
+                        if()
+                        tempObj.geometry = glFeatures[0].geometry;
+                        tempObj.properties = glFeatures[0].properties;
+                        tempObj.properties['is_flooded'] = true;
+
+                        $('#map').toggleClass('loading');
+                        console.log("loading to push");
+
+                        var id = md5(JSON.stringify(tempObj));
+                        tempObj.id = id;
+                        //var saveURL = DATASETS_BASE + 'features/' + id + '?access_token=' + datasetsAccessToken;
+                        //var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
+                        var saveURL = 'http://localhost:5500/model/put_data.php';
+                        console.log("about to push");
+                        console.log(tempObj);
+                        $.ajax({
+                            'method': 'POST',
+                            'crossDomain':true,
+                            'url': saveURL,
+                            'data': {'data' : tempObj},
+                            'dataType': 'json',
+                            'success': function (response) {
+                                $('#map').toggleClass('loading');
+                                console.log('no problem');
+                                console.log(data);
+                                tempObj.id = response.id;
+                                tempObj.properties.id = response.id;
+                                addedFeatures.push(tempObj);
+                                data.features.push(tempObj);
+                                addedBuildings.push(glFeatures[0].properties.osm_id);
+                                selectedBuidlingsSource.setData(getBuildings(data));
+                                updateFeatureCount(data);
+                            },
+                            'error': function (xhr, status, error) {
+                                $('#map').toggleClass('loading');
+                                var err = xhr.responseText + xhr.status;
+                                console.log('problem putting '+ err);
+                            }
+                        });
+                    });
+                    }// else close for inside buildings
+                });
+                }// else close for buildings
+                            
                         });
                     }
                 });
