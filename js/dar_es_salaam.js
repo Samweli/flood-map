@@ -161,6 +161,8 @@ map.on('style.load', function (e) {
         }
     });
 
+    var site = 'http://flood-dar.herokuapp.com/'
+
   // Select flooded roads
     var featuresGeoJSON = {
         'type': 'FeatureCollection',
@@ -172,7 +174,11 @@ map.on('style.load', function (e) {
         //var url = DATASETS_BASE + 'features.json';
         //var url = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
         console.log("start id "+startID);
-        var url = 'http://floods-daressalaam.rhcloud.com/get_data.php'
+       // var url = 'http://floods-daressalaam.rhcloud.com/get_data.php'
+       var site = 'http://flood-dar.herokuapp.com/'
+       var url = site + 'get_data.php'
+        // var url = 'http://localhost:5500/model/get_data.php'
+        
 
         var params = {
         };
@@ -297,7 +303,13 @@ map.on('style.load', function (e) {
 
                         //var saveURL = DATASETS_BASE + 'features.json/' + features[0].properties.id + '?access_token=' + datasetsAccessToken;
                         //var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
-                        var saveURL = 'http://floods-daressalaam.rhcloud.com/delete_data.php';
+                       
+                       // var saveURL = 'http://floods-daressalaam.rhcloud.com/delete_data.php';
+
+                        // var saveURL = 'http://localhost:5500/model/delete_data.php'
+
+                        var saveURL = site + 'delete_data.php'
+
                         var index = addedRoads.indexOf(features[0].properties.id);
                         $.ajax({
                             'method': 'POST',
@@ -341,7 +353,12 @@ map.on('style.load', function (e) {
                             tempObj.id = id;
                             //var saveURL = DATASETS_BASE + 'features/' + id + '?access_token=' + datasetsAccessToken;
                             //var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
-                            var saveURL = 'http://floods-daressalaam.rhcloud.com/put_data.php';
+                            //var saveURL = 'http://floods-daressalaam.rhcloud.com/put_data.php';
+
+                            // var saveURL = 'http://localhost:5500/model/put_data.php'
+
+                            var saveURL = site + 'put_data.php'
+
                             $.ajax({
                                 'method': 'POST',
                                 'crossDomain':true,
@@ -384,7 +401,14 @@ map.on('style.load', function (e) {
 
                                 //var saveURL = DATASETS_BASE + 'features.json/' + features[0].properties.id + '?access_token=' + datasetsAccessToken;
                                 //var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
-                                var saveURL = 'http://floods-daressalaam.rhcloud.com/delete_data.php';
+                                
+                                //var saveURL = 'http://floods-daressalaam.rhcloud.com/delete_data.php';
+
+                                // var saveURL = 'http://localhost:5500/model/delete_data.php';
+
+                                var saveURL = site + 'delete_data.php'
+
+
                                 var index = addedBuildings.indexOf(features[0].properties.id);
                                 $.ajax({
                                     'method': 'POST',
@@ -427,7 +451,14 @@ map.on('style.load', function (e) {
                         tempObj.id = id;
                         //var saveURL = DATASETS_BASE + 'features/' + id + '?access_token=' + datasetsAccessToken;
                         //var saveURL = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
-                        var saveURL = 'http://floods-daressalaam.rhcloud.com/put_data.php';
+                       
+                       // var saveURL = 'http://floods-daressalaam.rhcloud.com/put_data.php';
+
+                        // var saveURL = 'http://localhost:5500/model/put_data.php';
+
+                        var saveURL = site + 'put_data.php'
+
+
                         console.log("about to push buildings");
                         console.log(tempObj);
                         $.ajax({

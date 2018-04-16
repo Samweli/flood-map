@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Load GeoJSON</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
+<style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:100%; }
+</style>
+</head>
+<body>
+
+
+<div id='map'></div>
+<script>
+L.mapbox.accessToken = 'pk.eyJ1Ijoic2FtdHdlc2EiLCJhIjoiZTc1OTQ4ODE0ZmY2MzY0MGYwMDNjOWNlYTYxMjU4NDYifQ.F1zCcOYqpXWd4C9l9xqvEQ';
+var geojson = [
+  {"type":"Feature","geometry":{"type":"LineString","coordinates":[["39.26659852266312","-6.808132580715082"],["39.266657531261444","-6.808132580715082"],["39.26669508218765","-6.808119264235245"],["39.26674336194992","-6.808127254123178"],["39.26684260368347","-6.808119264235245"],["39.266976714134216","-6.808076651497245"],["39.26709473133087","-6.808020722272886"],["39.26718592643738","-6.807916853696071"],["39.26723688840866","-6.8078209749898235"]]},"properties":{"class":"path","oneway":"0","osm_id":"367499114","type":"footway","is_flooded":"true"},"id":"7c94c48d4c89fc0e34e3c251dcfb886b"},{"type":"Feature","geometry":{"type":"LineString","coordinates":[["39.26788866519928","-6.798597886607396"],["39.26784038543701","-6.7987230639850935"],["39.26779747009277","-6.798904171622752"],["39.26781356334686","-6.7992663866933185"]]},"properties":{"class":"path","oneway":"0","osm_id":"366793173","type":"footway","is_flooded":"true"},"id":"854927ae7360ee1b51c8acb8d8d5a949"},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[["39.21114921569824","-6.843848711064169"],["39.211173355579376","-6.843920614683384"],["39.21127796173096","-6.843885994423644"],["39.21125650405884","-6.843814090799199"],["39.21114921569824","-6.843848711064169"]]]},"properties":{"is_flooded":"true"},"id":"0ac4f89984343f21d03cc5e554c61db6"}
+];
+
+L.mapbox.map('map', 'mapbox.streets')
+  .setView([-6.10, 36.6], 4)
+  .featureLayer.setGeoJSON(geojson);
+</script>
+
+
+</body>
+</html>
+
