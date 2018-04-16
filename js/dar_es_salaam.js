@@ -161,7 +161,8 @@ map.on('style.load', function (e) {
         }
     });
 
-    var site = 'http://flood-dar.herokuapp.com/'
+    // var site = 'http://flood-dar.herokuapp.com/'
+    var site = 'http://test.twaamtaro.org/'
 
   // Select flooded roads
     var featuresGeoJSON = {
@@ -175,7 +176,8 @@ map.on('style.load', function (e) {
         //var url = 'http://samweli.github.io/flood-map/data/dar_es_salaam-flooded-streets.geojson'
         console.log("start id "+startID);
        // var url = 'http://floods-daressalaam.rhcloud.com/get_data.php'
-       var site = 'http://flood-dar.herokuapp.com/'
+       // var site = 'http://flood-dar.herokuapp.com/'
+       var site = 'http://test.twaamtaro.org/'
        var url = site + 'get_data.php'
         // var url = 'http://localhost:5500/model/get_data.php'
         
